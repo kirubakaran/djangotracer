@@ -11,14 +11,15 @@ class InsightMiddleware(object):
         pass
     
     def process_request(self, request):
-        if request.path.find('/tracer/') == 0:
-            return None
         global mc
+        if request.path.find('/tracer') == 0: return None
         uid = base64.urlsafe_b64encode(os.urandom(16))
-        now = dt.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        insertmc('req',uid,now,request.path)
+        now = dt.now()
+        nowstr = now.strftime("%Y-%m-%d %H:%M:%S.%f")
+        insertmc('req',uid,nowstr,request.path)
         request.uniq_req_id = uid
         #print "request %s at %s"%('req_'+uid,now,)
+        print "req overhead = %s microsec"%((dt.now()-now).microseconds)
         return None
 
     def process_response(self, request, response):
@@ -27,9 +28,11 @@ class InsightMiddleware(object):
             uid = request.uniq_req_id
         except:
             return response
-        now = "%s"%(dt.now(),)
-        insertmc('res',uid,now,request.path)
+        now = dt.now()
+        nowstr = now.strftime("%Y-%m-%d %H:%M:%S.%f")
+        insertmc('res',uid,nowstr,request.path)
         #print "response %s at %s"%(uid,now)
+        print "res overhead = %s microsec"%((dt.now()-now).microseconds)
         return response
 
 def insertmc(action,uid,data,path):
