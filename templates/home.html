@@ -1,0 +1,14 @@
+<html>
+  <body>
+    <table border='1'>
+      <tr>
+        <th>path</th><th>microsec</th>
+      </tr>
+      {% for t in timedelta %}
+      <tr>
+        <td>{{t.0}}</td><td>{{t.1}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

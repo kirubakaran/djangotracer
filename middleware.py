@@ -11,9 +11,11 @@ class InsightMiddleware(object):
         pass
     
     def process_request(self, request):
+        if request.path.find('/tracer/') == 0:
+            return None
         global mc
         uid = base64.urlsafe_b64encode(os.urandom(16))
-        now = "%s"%(dt.now(),)
+        now = dt.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         insertmc('req',uid,now,request.path)
         request.uniq_req_id = uid
         #print "request %s at %s"%('req_'+uid,now,)
