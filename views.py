@@ -14,6 +14,8 @@ def home(request):
     v = v_str.split('||')
     req,res = {},{}
     for zv in v:
+        if zv == '':
+            continue
         zvv = json.loads(zv)
         # 2012-07-20 22:46:55.922075
         t = dt.strptime(zvv[2],"%Y-%m-%d %H:%M:%S.%f")
@@ -34,10 +36,16 @@ def home(request):
             #skip unpaired
             continue
         paired[k] = [reqobj,resobj]
-        timedelta.append([v[1],(resobj[0]-reqobj[0]).microseconds])
+        td = (resobj[0]-reqobj[0]).microseconds
+        timedelta.append([v[1],
+                          td,
+                          int((td*1.0/1000.0)),
+                          k,
+                          ])
     #dthandler = lambda obj: obj.isoformat() if isinstance(obj, dt) else None
     #return HttpResponse(json.dumps(timedelta, default=dthandler),mimetype='application/json')
     #return HttpResponse(json.dumps(timedelta),mimetype='application/json')
+    timedelta.sort(key=lambda x: x[0])
     data = {
         'timedelta':timedelta,
         }

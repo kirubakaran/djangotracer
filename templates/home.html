@@ -1,12 +1,38 @@
 <html>
+  <head>
+    <style>
+      table.datatbl {
+      border:1px solid black;
+      border-collapse:collapse;
+      }
+      table.datatbl td,th {
+      border:1px solid black;
+      }
+      .uid {
+      font-family:'Courier New';
+      font-size:0.6em;
+      }
+      .timebar {
+      display:inline-block;
+      background-color:#0066FF;
+      margin:2px 0px;
+      }
+    </style>
+  </head>
   <body>
-    <table border='1'>
+    <table class='datatbl'>
       <tr>
-        <th>path</th><th>microsec</th>
+        <th>path</th>
+        <th>microsec</th>
+        <th>graph</th>
+        <th>uid</th>
       </tr>
       {% for t in timedelta %}
       <tr>
-        <td>{{t.0}}</td><td>{{t.1}}</td>
+        <td>{{t.0}}</td>
+        <td>{{t.1}}</td>
+        <td><span class='timebar' style='width:{{t.2}}px;'>&nbsp;</span></td>
+        <td class='uid'>{{t.3}}</td>
       </tr>
       {% endfor %}
     </table>
