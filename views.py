@@ -9,4 +9,6 @@ def home(request):
     v = v_str.split('||')
     return HttpResponse(json.dumps(v),mimetype='application/json')
 
-
+def reset(request):
+    mc.delete('djangotracer')
+    return HttpResponse('ok')

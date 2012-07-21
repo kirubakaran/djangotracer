@@ -14,9 +14,9 @@ class InsightMiddleware(object):
         global mc
         uid = base64.urlsafe_b64encode(os.urandom(16))
         now = "%s"%(dt.now(),)
-        insertmc('req',uid,now)
+        insertmc('req',uid,now,request.path)
         request.uniq_req_id = uid
-        print "request %s at %s"%('req_'+uid,now,)
+        #print "request %s at %s"%('req_'+uid,now,)
         return None
 
     def process_response(self, request, response):
@@ -26,14 +26,14 @@ class InsightMiddleware(object):
         except:
             return response
         now = "%s"%(dt.now(),)
-        insertmc('res',uid,now)
-        print "response %s at %s"%(uid,now)
+        insertmc('res',uid,now,request.path)
+        #print "response %s at %s"%(uid,now)
         return response
 
-def insertmc(action,uid,data):
+def insertmc(action,uid,data,path):
     global mc
     v_str = mc.get('djangotracer')
-    add = json.dumps([action,uid,data])    
+    add = json.dumps([action,uid,data,path])    
     if v_str == None:
         v_str = add
     else:
