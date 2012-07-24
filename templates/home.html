@@ -20,6 +20,8 @@
     </style>
   </head>
   <body>
+    <h1>Django Tracer</h1>
+    <p><a href='{% url tracerhome %}'>View All</a></p>
     <table class='datatbl'>
       <tr>
         <th>path</th>
@@ -28,7 +30,7 @@
       </tr>
       {% for t in rrdata %}
       <tr>
-        <td>{{t.path}}</td>
+        <td><a href="?path={{t.path}}">{{t.path}}</a></td>
         <td class='num'>{{t.elapsed}}</td>
         <td><span class='timebar' style='width:{{t.elapsed_pixels}}px;'>&nbsp;</span></td>
       </tr>

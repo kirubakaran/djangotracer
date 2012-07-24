@@ -15,7 +15,12 @@ import models
 def home(request):
     v_str = mc.get('djangotracer')
     persist(request)
-    d = models.TraceData.objects.all()
+    path = request.GET.get('path',None)
+    if path == None:
+        d = models.TraceData.objects.all().order_by('path')
+    else:
+        print "path =",path,"len =",len(path)
+        d = models.TraceData.objects.filter(path=path)
     rrdata = []
     for dd in d:
         rrdata.append({

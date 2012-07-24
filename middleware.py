@@ -36,7 +36,9 @@ class InsightMiddleware(object):
         pass
     
     def process_request(self, request):
-        if request.path.find('/tracer') == 0: return None
+        if request.path.find('/tracer/') == 0 or \
+          request.path.find('/admin/') == 0: 
+            return None
         t = TracerStore()
         t.setreqts()
         request.djangotracer = t
