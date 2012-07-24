@@ -1,47 +1,72 @@
 from datetime import datetime as dt
-import os
-import base64
 import json
 
-import pylibmc
-mc = pylibmc.Client(['127.0.0.1:11211'])
+# import pylibmc
+# mc = pylibmc.Client(['127.0.0.1:11211'])
+
+# trying memcache because i was occasionally getting errors with pylibmc
+# and people think python-memcached is the solution
+# https://lists.infrae.com/pipermail/silva-dev/2011q3/002241.html
+import memcache
+mc = memcache.Client(['127.0.0.1:11211'])
+
+class TracerStore(object):
+    def __init__(self):
+        self.reqts = None
+        self.rests = None
+        return
+
+    def setreqts(self):
+        self.reqts = dt.now()
+        return
+
+    def setrests(self):
+        self.rests = dt.now()
+        return
+
+    def getstate(self):
+        if self.reqts == None or self.rests == None:
+           return None
+        else:
+            timestamp_format = "%Y-%m-%d %H:%M:%S.%f"
+            return {
+                'reqts'   : self.reqts.strftime(timestamp_format),
+                'rests'   : self.rests.strftime(timestamp_format),
+            }
 
 class InsightMiddleware(object):
     def __init__(self):
         pass
     
     def process_request(self, request):
-        global mc
         if request.path.find('/tracer') == 0: return None
-        uid = base64.urlsafe_b64encode(os.urandom(16))
-        now = dt.now()
-        nowstr = now.strftime("%Y-%m-%d %H:%M:%S.%f")
-        insertmc('req',uid,nowstr,request.path)
-        request.uniq_req_id = uid
-        #print "request %s at %s"%('req_'+uid,now,)
-        print "req overhead = %s microsec"%((dt.now()-now).microseconds)
+        t = TracerStore()
+        t.setreqts()
+        request.djangotracer = t
         return None
 
-    def process_response(self, request, response):
-        global mc
+    def process_response(self, request, response):        
         try:
-            uid = request.uniq_req_id
+            t = request.djangotracer
         except:
             return response
-        now = dt.now()
-        nowstr = now.strftime("%Y-%m-%d %H:%M:%S.%f")
-        insertmc('res',uid,nowstr,request.path)
-        #print "response %s at %s"%(uid,now)
-        print "res overhead = %s microsec"%((dt.now()-now).microseconds)
+        t.setrests()
+        state = t.getstate()        
+        if state != None:
+            state['path'] = request.path
+            insertmc(state)
         return response
 
-def insertmc(action,uid,data,path):
+def insertmc(state):
     global mc
+    n1 = dt.now()
     v_str = mc.get('djangotracer')
-    add = json.dumps([action,uid,data,path])    
+    add = json.dumps(state)
     if v_str == None:
         v_str = add
     else:
         v_str += "||"+add    
     mc.set('djangotracer',v_str)
+    n2 = dt.now()
+    print "memcache overhead = %s microseconds"%((n2-n1).microseconds,)
     return

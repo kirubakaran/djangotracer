@@ -11,41 +11,22 @@ mc = pylibmc.Client(['127.0.0.1:11211'])
 
 def home(request):
     v_str = mc.get('djangotracer')
-    v = v_str.split('||')
-    req,res = {},{}
-    for zv in v:
-        if zv == '':
-            continue
-        zvv = json.loads(zv)
-        # 2012-07-20 22:46:55.922075
-        t = dt.strptime(zvv[2],"%Y-%m-%d %H:%M:%S.%f")
-        data = [t, zvv[3]]
-        if zvv[0] == "req":
-            req[zvv[1]] = data
-        elif zvv[0] == "res":
-            res[zvv[1]] = data
-        else:
-            continue
-    paired = {}
     timedelta = []
-    for k,v in req.items():
-        reqobj = v
-        try:
-            resobj = res[k]
-        except KeyError:
-            #skip unpaired
-            continue
-        paired[k] = [reqobj,resobj]
-        td = (resobj[0]-reqobj[0]).microseconds
-        timedelta.append([v[1],
-                          td,
-                          int((td*1.0/1000.0)),
-                          k,
-                          ])
-    #dthandler = lambda obj: obj.isoformat() if isinstance(obj, dt) else None
-    #return HttpResponse(json.dumps(timedelta, default=dthandler),mimetype='application/json')
-    #return HttpResponse(json.dumps(timedelta),mimetype='application/json')
-    timedelta.sort(key=lambda x: x[0])
+    if v_str != None:
+        v = v_str.split('||')
+        for zv in v:
+            if zv == '':
+                continue
+            zvv = json.loads(zv)
+            timestamp_format = "%Y-%m-%d %H:%M:%S.%f"
+            treq = dt.strptime(zvv['reqts'],timestamp_format)
+            tres = dt.strptime(zvv['rests'],timestamp_format)
+            elapsed = (tres - treq).microseconds
+            zvv['elapsed'] = elapsed
+            zvv['elapsed_pixels'] = int(zvv['elapsed']*1.0/1000.0)
+            timedelta.append(zvv)
+
+    timedelta.sort(key=lambda x: x['path'])
     data = {
         'timedelta':timedelta,
         }
