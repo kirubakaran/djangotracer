@@ -1,9 +1,6 @@
 from datetime import datetime as dt
 import json
 
-# import pylibmc
-# mc = pylibmc.Client(['127.0.0.1:11211'])
-
 # trying memcache because i was occasionally getting errors with pylibmc
 # and people think python-memcached is the solution
 # https://lists.infrae.com/pipermail/silva-dev/2011q3/002241.html

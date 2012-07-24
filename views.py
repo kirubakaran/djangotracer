@@ -6,8 +6,8 @@ import json
 import os
 from datetime import datetime as dt
 
-import pylibmc
-mc = pylibmc.Client(['127.0.0.1:11211'])
+import memcache
+mc = memcache.Client(['127.0.0.1:11211'])
 
 def home(request):
     v_str = mc.get('djangotracer')
