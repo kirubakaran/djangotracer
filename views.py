@@ -2,6 +2,8 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.template import Template, Context
 from django.shortcuts import render_to_response
 from django.db import transaction
+from django.db.models import Avg
+from django.forms.models import model_to_dict
 
 import json
 import os
@@ -17,16 +19,21 @@ def home(request):
     persist(request)
     path = request.GET.get('path',None)
     if path == None:
-        d = models.TraceData.objects.all().order_by('path')
+        d = models.TraceData.objects.values('path').annotate(elapsed_avg=Avg('elapsed'))
     else:
-        print "path =",path,"len =",len(path)
-        d = models.TraceData.objects.filter(path=path)
+        d = models.TraceData.objects.filter(path=path).order_by('-reqts')
     rrdata = []
     for dd in d:
+        if type(dd) != type(dict()):
+            dd = model_to_dict(dd)
+        if path == None:
+            e = int(dd['elapsed_avg'])
+        else:
+            e = dd['elapsed']
         rrdata.append({
-            'path':dd.path,
-            'elapsed':dd.elapsed,
-            'elapsed_pixels':dd.elapsed*1.0/1000.0,
+            'path':dd['path'],
+            'elapsed':e,
+            'elapsed_pixels':int(e*1.0/1000.0),
             })
     data = {
         'rrdata':rrdata,
