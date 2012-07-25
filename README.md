@@ -15,8 +15,10 @@ Installation
 1. Add ```'PrjDir.djangotracer.middleware.InsightMiddleware'``` to MIDDLEWARE_CLASSES in settings.py of your project
 1. Add ```url(r'^tracer/', include('PrjDir.djangotracer.urls')),``` to urls.py of your project
 1. Install the following packages
-
    1. python-memcached
-
 1. Run ```python manage.py syncdb```
 1. You can access the app at http://[your url]/tracer
+
+Feedback
+--------
+Please send me your feedback at djangotracer@kirubakaran.com I'd love to hear from you. Thanks!
