@@ -9,10 +9,12 @@ Read the file "LICENSE" distributed with this project
 
 Installation
 ------------
-1. ```cd``` to the your Django project directory that contains your Django apps
+1. ```cd``` to the your Django project directory that contains your Django apps. We'll refer to this directory as ```PrjDir``` from now
 1. Place djangotracer app there by executing ```git clone git://github.com/kirubakaran/djangotracer.git```
-1. Update your settings.py and urls.py [todo : expand this step]
-1. Install the required packages [todo : expand this step]
+1. Add ```PrjDir.djangotracer``` to INSTALLED_APPS in settings.py of your project
+1. Add ```'PrjDir.djangotracer.middleware.InsightMiddleware'``` to MIDDLEWARE_CLASSES in settings.py of your project
+1. Add ```url(r'^tracer/', include('PrjDir.djangotracer.urls')),``` to urls.py of your project
+1. Install the following packages
 
    1. python-memcached
 
