@@ -10,6 +10,7 @@ Read the file "LICENSE" distributed with this project
 Installation
 ------------
 I'll provide setup.py soon. Use the following steps for now:
+
 1. ```cd``` to the your Django project directory that contains your Django apps. We'll refer to this directory as ```PrjDir``` from now
 1. Place djangotracer app there by executing ```git clone git://github.com/kirubakaran/djangotracer.git```
 1. Add ```'PrjDir.djangotracer'``` to INSTALLED_APPS in settings.py of your project
